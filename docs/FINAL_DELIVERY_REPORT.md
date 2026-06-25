@@ -56,18 +56,18 @@
 
 ## Remaining User Actions
 
-After Vercel login works locally:
+After Vercel login works locally. If this machine uses proxy environment variables, keep `NODE_USE_ENV_PROXY=1` on Vercel CLI commands:
 
 ```bash
-vercel login
-vercel link --yes --project excavator --scope githubcomsiner9586excavator
-vercel env add DATABASE_URL production
-vercel env add DIRECT_URL production
-vercel env add NEXT_PUBLIC_APP_URL production
-vercel env add NEXT_PUBLIC_APP_NAME production
-vercel env add AUTH_SECRET production
-vercel env add AUTH_TRUST_HOST production
-vercel deploy --prod
+NODE_USE_ENV_PROXY=1 vercel login
+NODE_USE_ENV_PROXY=1 vercel link --yes --project excavator --scope githubcomsiner9586excavator
+NODE_USE_ENV_PROXY=1 vercel env add DATABASE_URL production
+NODE_USE_ENV_PROXY=1 vercel env add DIRECT_URL production
+NODE_USE_ENV_PROXY=1 vercel env add NEXT_PUBLIC_APP_URL production
+NODE_USE_ENV_PROXY=1 vercel env add NEXT_PUBLIC_APP_NAME production
+NODE_USE_ENV_PROXY=1 vercel env add AUTH_SECRET production
+NODE_USE_ENV_PROXY=1 vercel env add AUTH_TRUST_HOST production
+NODE_USE_ENV_PROXY=1 vercel deploy --prod
 ```
 
 After GitHub billing/spending status is fixed, rerun the CI workflow from GitHub Actions.

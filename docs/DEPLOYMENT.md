@@ -50,16 +50,18 @@ pnpm prisma:seed
 ## CLI fallback
 
 ```bash
-vercel login
-vercel link --yes --project excavator --scope githubcomsiner9586excavator
-vercel env add DATABASE_URL production
-vercel env add DIRECT_URL production
-vercel env add NEXT_PUBLIC_APP_URL production
-vercel env add NEXT_PUBLIC_APP_NAME production
-vercel env add AUTH_SECRET production
-vercel env add AUTH_TRUST_HOST production
-vercel deploy --prod
+NODE_USE_ENV_PROXY=1 vercel login
+NODE_USE_ENV_PROXY=1 vercel link --yes --project excavator --scope githubcomsiner9586excavator
+NODE_USE_ENV_PROXY=1 vercel env add DATABASE_URL production
+NODE_USE_ENV_PROXY=1 vercel env add DIRECT_URL production
+NODE_USE_ENV_PROXY=1 vercel env add NEXT_PUBLIC_APP_URL production
+NODE_USE_ENV_PROXY=1 vercel env add NEXT_PUBLIC_APP_NAME production
+NODE_USE_ENV_PROXY=1 vercel env add AUTH_SECRET production
+NODE_USE_ENV_PROXY=1 vercel env add AUTH_TRUST_HOST production
+NODE_USE_ENV_PROXY=1 vercel deploy --prod
 ```
+
+如果本机设置了 `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`，Node 24 的 Vercel CLI 登录流可能不会默认使用这些代理。此时需要显式加 `NODE_USE_ENV_PROXY=1`，否则可能出现 `Client network socket disconnected before secure TLS connection was established`。
 
 ## 常见错误
 
