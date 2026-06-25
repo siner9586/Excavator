@@ -34,6 +34,7 @@ pnpm prisma:seed
 - Install Command：`pnpm install`
 - Build Command：`pnpm build`
 - Output：Next.js 默认
+- Repository config：`vercel.json`
 
 ## Vercel 环境变量
 
@@ -45,6 +46,20 @@ pnpm prisma:seed
 - `AUTH_TRUST_HOST`
 
 不要把真实连接串写入 GitHub。
+
+## CLI fallback
+
+```bash
+vercel login
+vercel link --yes --project excavator --scope githubcomsiner9586excavator
+vercel env add DATABASE_URL production
+vercel env add DIRECT_URL production
+vercel env add NEXT_PUBLIC_APP_URL production
+vercel env add NEXT_PUBLIC_APP_NAME production
+vercel env add AUTH_SECRET production
+vercel env add AUTH_TRUST_HOST production
+vercel deploy --prod
+```
 
 ## 常见错误
 
