@@ -1,0 +1,25 @@
+# Acceptance Checklist
+
+- [ ] `pnpm install`
+- [ ] `pnpm prisma:generate`
+- [ ] `pnpm prisma:migrate --name init`
+- [ ] `pnpm prisma:seed`
+- [ ] `pnpm lint`
+- [ ] `pnpm build`
+- [ ] `pnpm smoke:test`
+- [ ] `/` 可访问
+- [ ] `/machines` 可访问
+- [ ] `/sell` 表单可提交
+- [ ] `/buy-request` 表单可提交
+- [ ] `/inspection` 表单可提交
+- [ ] `/valuation` 可交互
+- [ ] `/certified` 可访问
+- [ ] `/logistics-finance` 表单可提交
+- [ ] `/guides` 可访问
+- [ ] `/merchants` 表单可提交
+- [ ] `/trade-flow` 可访问
+- [ ] `/admin` 可访问
+- [ ] `/admin/machines` 可 PATCH 更新
+- [ ] Vercel build 通过
+- [ ] Neon 数据库可连接
+- [ ] GitHub main 已推送

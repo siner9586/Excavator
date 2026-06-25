@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f6f7f8;
+  color: #242424;
+}
+
+a {
+  text-decoration: none;
+}
+
+::selection {
+  background: #f4b000;
+  color: #151515;
+}
+
+.container-page {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+}

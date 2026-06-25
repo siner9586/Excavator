@@ -1,0 +1,388 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  BUYER
+  SELLER
+  MERCHANT
+  INSPECTOR
+  ADMIN
+  OPERATOR
+}
+
+enum CompanyType {
+  DEALER
+  RENTAL_COMPANY
+  LOGISTICS
+  REPAIR
+  FINANCE
+  INSURANCE
+  EXPORT_SERVICE
+}
+
+enum SellerType {
+  PERSONAL
+  MERCHANT
+  PLATFORM
+}
+
+enum OwnershipStatus {
+  UNKNOWN
+  PARTIAL
+  VERIFIED
+}
+
+enum InspectionStatus {
+  NONE
+  BOOKED
+  INSPECTED
+  CERTIFIED
+}
+
+enum TradeMode {
+  P2P
+  CONSIGNMENT
+  PLATFORM_OWNED
+}
+
+enum MachineStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  CERTIFIED
+  SOLD
+  HIDDEN
+}
+
+enum InquiryType {
+  PRICE_INQUIRY
+  VIEW_APPOINTMENT
+  TRADE_SERVICE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  MATCHED
+  DEAL
+  INVALID
+}
+
+enum InspectionOrderStatus {
+  PENDING
+  ASSIGNED
+  INSPECTING
+  REPORT_READY
+  COMPLETED
+  CANCELLED
+}
+
+enum InspectionGrade {
+  A
+  B
+  C
+  D
+  E
+}
+
+enum TradeOrderStatus {
+  DRAFT
+  DEPOSIT_PENDING
+  DEPOSIT_PAID
+  CONTRACT_SIGNED
+  DELIVERY_PENDING
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
+enum MerchantApplicationStatus {
+  NEW
+  CONTACTED
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  email     String?
+  role      UserRole @default(BUYER)
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Company {
+  id          String      @id @default(cuid())
+  name        String
+  type        CompanyType
+  contactName String
+  phone       String
+  province    String
+  city        String
+  verified    Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Machine {
+  id                String             @id @default(cuid())
+  title             String
+  brand             String
+  model             String
+  tonnage           Float
+  year              Int
+  workingHours      Int
+  price             Float
+  province          String
+  city              String
+  address           String
+  description       String
+  sellerName        String
+  sellerPhone       String
+  sellerType        SellerType         @default(PERSONAL)
+  ownershipStatus   OwnershipStatus    @default(UNKNOWN)
+  inspectionStatus  InspectionStatus   @default(NONE)
+  tradeMode         TradeMode          @default(P2P)
+  status            MachineStatus      @default(PENDING_REVIEW)
+  isUrgent          Boolean            @default(false)
+  isCertified       Boolean            @default(false)
+  isMainstreamModel Boolean            @default(true)
+  mainImage         String?
+  videoUrl          String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  photos            MachinePhoto[]
+  spec              MachineSpec?
+  ownershipDocs     OwnershipDoc[]
+  inquiries         Inquiry[]
+  inspectionOrders  InspectionOrder[]
+  inspectionReports InspectionReport[]
+  tradeOrders       TradeOrder[]
+
+  @@index([brand, model, province, city, status])
+  @@index([price])
+  @@index([year])
+  @@index([workingHours])
+  @@index([tonnage])
+  @@index([status, isCertified, isUrgent])
+}
+
+model MachinePhoto {
+  id        String  @id @default(cuid())
+  machineId String
+  url       String
+  sortOrder Int     @default(0)
+  machine   Machine @relation(fields: [machineId], references: [id], onDelete: Cascade)
+
+  @@index([machineId])
+}
+
+model MachineSpec {
+  id              String  @id @default(cuid())
+  machineId       String  @unique
+  engine          String?
+  hydraulicPump   String?
+  bucketCapacity  Float?
+  operatingWeight Float?
+  origin          String?
+  serialNumber    String?
+  engineNumber    String?
+  machine         Machine @relation(fields: [machineId], references: [id], onDelete: Cascade)
+}
+
+model OwnershipDoc {
+  id        String  @id @default(cuid())
+  machineId String
+  docType   String
+  url       String
+  verified  Boolean @default(false)
+  note      String?
+  machine   Machine @relation(fields: [machineId], references: [id], onDelete: Cascade)
+
+  @@index([machineId])
+}
+
+model Inquiry {
+  id        String      @id @default(cuid())
+  machineId String
+  name      String
+  phone     String
+  message   String?
+  type      InquiryType @default(PRICE_INQUIRY)
+  status    LeadStatus  @default(NEW)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  machine   Machine     @relation(fields: [machineId], references: [id], onDelete: Cascade)
+
+  @@index([machineId])
+  @@index([status, createdAt])
+}
+
+model BuyRequest {
+  id              String     @id @default(cuid())
+  name            String
+  phone           String
+  budgetMin       Float
+  budgetMax       Float
+  preferredBrands String
+  tonnageMin      Float
+  tonnageMax      Float
+  province        String
+  city            String
+  usage           String
+  expectedYear    Int?
+  maxWorkingHours Int?
+  needInspection  Boolean    @default(true)
+  needLogistics   Boolean    @default(false)
+  needFinance     Boolean    @default(false)
+  note            String?
+  status          LeadStatus @default(NEW)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([status, createdAt])
+  @@index([province, city])
+}
+
+model InspectionOrder {
+  id             String                @id @default(cuid())
+  machineId      String?
+  requesterName  String
+  requesterPhone String
+  province       String
+  city           String
+  address        String
+  preferredTime  DateTime?
+  note           String?
+  status         InspectionOrderStatus @default(PENDING)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  machine        Machine?              @relation(fields: [machineId], references: [id], onDelete: SetNull)
+  report         InspectionReport?
+
+  @@index([machineId])
+  @@index([status, createdAt])
+}
+
+model InspectionReport {
+  id              String          @id @default(cuid())
+  machineId       String
+  orderId         String?         @unique
+  grade           InspectionGrade
+  engineScore     Int
+  hydraulicScore  Int
+  chassisScore    Int
+  electricScore   Int
+  appearanceScore Int
+  riskSummary     String
+  valuationMin    Float
+  valuationMax    Float
+  reportUrl       String?
+  createdAt       DateTime        @default(now())
+  machine         Machine         @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  order           InspectionOrder? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([machineId])
+}
+
+model ValuationRecord {
+  id                    String   @id @default(cuid())
+  brand                 String
+  model                 String
+  tonnage               Float
+  year                  Int
+  workingHours          Int
+  province              String
+  conditionGrade        String
+  isMainstreamModel     Boolean  @default(true)
+  valuationMin          Float
+  valuationMax          Float
+  suggestedListingPrice Float
+  suggestedDealPrice    Float
+  riskNotes             String
+  createdAt             DateTime @default(now())
+
+  @@index([brand, model, province])
+  @@index([createdAt])
+}
+
+model TradeOrder {
+  id            String           @id @default(cuid())
+  machineId     String
+  buyerName     String
+  buyerPhone    String
+  sellerName    String
+  sellerPhone   String
+  amount        Float
+  depositAmount Float
+  status        TradeOrderStatus @default(DRAFT)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  machine       Machine          @relation(fields: [machineId], references: [id], onDelete: Cascade)
+
+  @@index([machineId])
+  @@index([status, createdAt])
+}
+
+model LogisticsLead {
+  id            String   @id @default(cuid())
+  name          String
+  phone         String
+  fromProvince  String
+  fromCity      String
+  toProvince    String
+  toCity        String
+  machineInfo   String
+  needInsurance Boolean  @default(false)
+  needFinance   Boolean  @default(false)
+  note          String?
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model MerchantApplication {
+  id                   String                    @id @default(cuid())
+  companyName          String
+  contactName          String
+  phone                String
+  businessType         String
+  province             String
+  city                 String
+  description          String
+  hasOfflineYard       Boolean                   @default(false)
+  canProvideInspection Boolean                   @default(false)
+  canProvideRepair     Boolean                   @default(false)
+  canProvideLogistics  Boolean                   @default(false)
+  canProvideFinance    Boolean                   @default(false)
+  status               MerchantApplicationStatus @default(NEW)
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([province, city])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actor      String
+  action     String
+  targetType String
+  targetId   String
+  detail     String?
+  createdAt  DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
